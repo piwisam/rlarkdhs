@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f4f4f4;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .button {
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 15px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
+        }
+
+        .circle {
+            width: 50px;
+            height: 50px;
+            background-color: blue;
+            border-radius: 50%;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none;
+            cursor: pointer;
+        }
+
+        .yellow-circle {
+            width: 50px;
+            height: 50px;
+            background-color: yellow;
+            border-radius: 50%;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .red-square {
+            width: 50px;
+            height: 50px;
+            background-color: red;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .message-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 24px;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <button class="button" onclick="enableCircles(this)">Click Me</button>
+    <div class="circle" id="circle"></div>
+
+    <!-- The message box for asking "저장하시겠습니까?" -->
+    <div class="message-box" id="messageBox">
+        저장하시겠습니까?
+    </div>
+
+    <script>
+        let circlesEnabled = false;
+
+        function enableCircles(button) {
+            const circle = document.getElementById('circle');
+            circle.style.display = 'block';
+            button.style.display = 'none';
+            circlesEnabled = true;
+            removeAllShapesExceptCircle();
+        }
+
+        let isMouseDown = false;
+
+        document.body.addEventListener('mousedown', function(event) {
+            if (!circlesEnabled) return;
+            isMouseDown = true;
+            if (event.target.classList.contains('button')) return;
+            const yellowCircle = document.createElement('div');
+            yellowCircle.classList.add('yellow-circle');
+            yellowCircle.style.left = `${event.clientX - 25}px`;
+            yellowCircle.style.top = `${event.clientY - 25}px`;
+            document.body.appendChild(yellowCircle);
+        });
+
+        document.body.addEventListener('mouseup', function() {
+            isMouseDown = false;
+        });
+
+        document.body.addEventListener('mousemove', function(event) {
+            if (!circlesEnabled || !isMouseDown) return;
+            const yellowCircle = document.createElement('div');
+            yellowCircle.classList.add('yellow-circle');
+            yellowCircle.style.left = `${event.clientX - 25}px`;
+            yellowCircle.style.top = `${event.clientY - 25}px`;
+            document.body.appendChild(yellowCircle);
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'f' || event.key === 'F') {
+                // Remove yellow circles and red squares when F key is pressed
+                const yellowCircles = document.querySelectorAll('.yellow-circle');
+                yellowCircles.forEach(circle => circle.remove());
+                const redSquares = document.querySelectorAll('.red-square');
+                redSquares.forEach(square => square.remove());
+            } else if (event.key === 'r' || event.key === 'R') {
+                const yellowCircles = document.querySelectorAll('.yellow-circle');
+                yellowCircles.forEach(circle => {
+                    const redSquare = document.createElement('div');
+                    redSquare.classList.add('red-square');
+                    redSquare.style.left = circle.style.left;
+                    redSquare.style.top = circle.style.top;
+                    circle.replaceWith(redSquare);
+                });
+            }
+        });
+
+        // Remove all shapes except the blue circle
+        function removeAllShapesExceptCircle() {
+            const yellowCircles = document.querySelectorAll('.yellow-circle');
+            yellowCircles.forEach(circle => circle.remove());
+            const redSquares = document.querySelectorAll('.red-square');
+            redSquares.forEach(square => square.remove());
+        }
+
+        // Add a click event to the blue circle to display the message
+        document.getElementById('circle').addEventListener('click', function() {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.style.display = 'block'; // Show the message
+        });
+    </script>
+</body>
+</html>
